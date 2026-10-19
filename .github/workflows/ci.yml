@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  lint-test-build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: familyhub
+          POSTGRES_PASSWORD: familyhub
+          POSTGRES_DB: familyhub
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U familyhub -d familyhub"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://familyhub:familyhub@localhost:5432/familyhub?schema=public
+      NODE_ENV: test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Installer les dépendances
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Linter d'architecture
+        run: pnpm lint:arch
+
+      - name: Client Prisma
+        run: pnpm prisma:generate
+
+      - name: Tests
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Migration sur base vierge
+        run: pnpm --filter @family-hub/api prisma:deploy

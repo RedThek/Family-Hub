@@ -1,11 +1,13 @@
-# Nestjs specific
-/dist
-/node_modules
-/build
-/tmp
+# Dependencies and build
+node_modules/
+dist/
+build/
+coverage/
+.turbo/
+*.tsbuildinfo
 
 # Logs
-logs
+logs/
 *.log
 npm-debug.log*
 pnpm-debug.log*
@@ -13,12 +15,37 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
-# dotenv environment variable files
+# Environment secrets (ADR-014, doc 05 §8)
 .env
+.env.local
 .env.development
 .env.test
 .env.production
+.env.*.local
 
-# temp directory
-.temp
-.tmp
+# Temp
+.temp/
+.tmp/
+tmp/
+*.architecture-fixture.ts
+
+# Tooling
+.eslintcache
+.pnpm-store/
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Prisma
+apps/api/prisma/*.db
+apps/api/prisma/*.db-journal
+
+# Vite
+apps/web/dist/
+
+# Docker volumes (if ever mounted locally)
+data/

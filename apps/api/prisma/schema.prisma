@@ -1,0 +1,433 @@
+// Schéma de base — doc 03 (v0.3). Contraintes CHK-02/04/05 dans la migration SQL.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Sex {
+  M
+  F
+}
+
+enum LifeStatus {
+  living
+  deceased
+  unknown
+}
+
+enum DatePrecision {
+  year
+  month
+  day
+}
+
+enum UnionStatus {
+  married
+  partnered
+  separated
+  divorced
+  widowed
+}
+
+enum ParentLinkKind {
+  biological
+  adoptive
+}
+
+enum ClosurePathType {
+  all
+  biological
+  paternal
+}
+
+enum VisibilityCategory {
+  general
+  details
+  media
+}
+
+enum VisibilityLevel {
+  public
+  members_only
+  approved
+  private
+}
+
+enum AccountStatus {
+  invited
+  pending_approval
+  approved
+  suspended
+}
+
+enum ScopeType {
+  global
+  branch
+  house
+}
+
+enum PendingChangeStatus {
+  pending
+  approved
+  rejected
+  withdrawn
+}
+
+enum ChangeOperation {
+  create
+  update
+  delete
+}
+
+enum HistorySource {
+  direct
+  moderated
+}
+
+enum DocType {
+  birth_certificate
+  marriage_certificate
+  death_certificate
+  other
+}
+
+model Person {
+  id                  String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  firstNames          String         @map("first_names")
+  lastName            String         @map("last_name")
+  sex                 Sex
+  lifeStatus          LifeStatus     @map("life_status")
+  birthDate           DateTime?      @map("birth_date") @db.Date
+  birthDatePrecision  DatePrecision? @map("birth_date_precision")
+  birthPlace          String?        @map("birth_place")
+  deathDate           DateTime?      @map("death_date") @db.Date
+  deathDatePrecision  DatePrecision? @map("death_date_precision")
+  deathPlace          String?        @map("death_place")
+  photoFileId         String?        @unique @map("photo_file_id") @db.Uuid
+  rowVersion          Int            @default(0) @map("row_version")
+  isDeleted           Boolean        @default(false) @map("is_deleted")
+
+  photoFile             StoredFile?       @relation("PersonPhoto", fields: [photoFileId], references: [id])
+  account               Account?
+  parentLinksAsParent   ParentLink[]      @relation("Parent")
+  parentLinksAsChild    ParentLink[]      @relation("Child")
+  unionsAsA             PersonUnion[]     @relation("UnionA")
+  unionsAsB             PersonUnion[]     @relation("UnionB")
+  visibilities          PersonVisibility[]
+  documents             Document[]
+  closuresAsAncestor    PersonClosure[]   @relation("Ancestor")
+  closuresAsDescendant  PersonClosure[]   @relation("Descendant")
+  foundedBranches       Branch[]
+  invitations           Invitation[]
+
+  @@map("person")
+}
+
+model Account {
+  id           String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email        String        @unique
+  passwordHash String        @map("password_hash")
+  status       AccountStatus
+  personId     String?       @unique @map("person_id") @db.Uuid
+  approvedById String?       @map("approved_by") @db.Uuid
+  approvedAt   DateTime?     @map("approved_at")
+
+  person                   Person?           @relation(fields: [personId], references: [id])
+  approvedBy               Account?          @relation("AccountApproval", fields: [approvedById], references: [id])
+  approvedAccounts         Account[]         @relation("AccountApproval")
+  roleAssignments          RoleAssignment[]  @relation("AssignmentHolder")
+  assignmentsGiven         RoleAssignment[]  @relation("AssignmentAuthor")
+  invitationsSent          Invitation[]
+  pendingChangesAuthored   PendingChange[]   @relation("PendingAuthor")
+  pendingChangesDecided    PendingChange[]   @relation("PendingDecider")
+  notifications            Notification[]
+  fieldHistories           FieldHistory[]
+  changeLogs               ChangeLog[]
+
+  @@map("account")
+}
+
+model PersonUnion {
+  id         String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  personAId  String      @map("person_a_id") @db.Uuid
+  personBId  String      @map("person_b_id") @db.Uuid
+  status     UnionStatus
+  startDate  DateTime?   @map("start_date") @db.Date
+  endDate    DateTime?   @map("end_date") @db.Date
+  place      String?
+  rowVersion Int         @default(0) @map("row_version")
+
+  personA   Person    @relation("UnionA", fields: [personAId], references: [id])
+  personB   Person    @relation("UnionB", fields: [personBId], references: [id])
+  documents Document[]
+  houses    House[]
+
+  @@index([personAId])
+  @@index([personBId])
+  @@map("person_union")
+}
+
+model ParentLink {
+  id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  parentId     String         @map("parent_id") @db.Uuid
+  childId      String         @map("child_id") @db.Uuid
+  kind         ParentLinkKind
+  adoptionDate DateTime?      @map("adoption_date") @db.Date
+  rowVersion   Int            @default(0) @map("row_version")
+
+  parent Person @relation("Parent", fields: [parentId], references: [id])
+  child  Person @relation("Child", fields: [childId], references: [id])
+
+  @@unique([parentId, childId])
+  @@index([childId])
+  @@map("parent_link")
+}
+
+model PersonVisibility {
+  personId String              @map("person_id") @db.Uuid
+  category VisibilityCategory
+  level    VisibilityLevel
+
+  person Person @relation(fields: [personId], references: [id])
+
+  @@id([personId, category])
+  @@map("person_visibility")
+}
+
+model PersonClosure {
+  ancestorId   String          @map("ancestor_id") @db.Uuid
+  descendantId String          @map("descendant_id") @db.Uuid
+  pathType     ClosurePathType @map("path_type")
+  depth        Int
+
+  ancestor   Person @relation("Ancestor", fields: [ancestorId], references: [id])
+  descendant Person @relation("Descendant", fields: [descendantId], references: [id])
+
+  @@id([ancestorId, descendantId, pathType])
+  @@index([descendantId, pathType, depth])
+  @@index([ancestorId, pathType, depth])
+  @@map("person_closure")
+}
+
+model StoredFile {
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  storageKey String @unique @map("storage_key")
+  mimeType   String @map("mime_type")
+  sizeBytes  Int    @map("size_bytes")
+  sha256     String
+
+  personPhotos Person[]   @relation("PersonPhoto")
+  documents    Document[]
+
+  @@map("stored_file")
+}
+
+model Document {
+  id               String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  personId         String?         @map("person_id") @db.Uuid
+  unionId          String?         @map("union_id") @db.Uuid
+  docType          DocType         @map("doc_type")
+  fileId           String          @map("file_id") @db.Uuid
+  visibilityLevel  VisibilityLevel @map("visibility_level")
+
+  person Person?      @relation(fields: [personId], references: [id])
+  union  PersonUnion? @relation(fields: [unionId], references: [id])
+  file   StoredFile   @relation(fields: [fileId], references: [id])
+
+  @@index([personId])
+  @@index([unionId])
+  @@map("document")
+}
+
+model Branch {
+  id              String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name            String
+  founderPersonId String  @map("founder_person_id") @db.Uuid
+  parentBranchId  String? @map("parent_branch_id") @db.Uuid
+
+  founder      Person   @relation(fields: [founderPersonId], references: [id])
+  parentBranch Branch?  @relation("BranchTree", fields: [parentBranchId], references: [id])
+  childBranches Branch[] @relation("BranchTree")
+  houses       House[]
+
+  @@index([founderPersonId])
+  @@map("branch")
+}
+
+model House {
+  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  branchId String @map("branch_id") @db.Uuid
+  unionId  String @map("union_id") @db.Uuid
+  name     String
+
+  branch Branch      @relation(fields: [branchId], references: [id])
+  union  PersonUnion @relation(fields: [unionId], references: [id])
+
+  @@unique([branchId, unionId])
+  @@map("house")
+}
+
+model Role {
+  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code     String @unique
+  label    String
+  isSystem Boolean @default(false) @map("is_system")
+
+  permissions RolePermission[]
+  assignments RoleAssignment[]
+  policies    RolePolicy[]
+
+  @@map("role")
+}
+
+model Permission {
+  code        String @id
+  description String
+
+  roles RolePermission[]
+
+  @@map("permission")
+}
+
+model RolePermission {
+  roleId          String @map("role_id") @db.Uuid
+  permissionCode  String @map("permission_code")
+
+  role       Role       @relation(fields: [roleId], references: [id])
+  permission Permission @relation(fields: [permissionCode], references: [code])
+
+  @@id([roleId, permissionCode])
+  @@map("role_permission")
+}
+
+model RoleAssignment {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  accountId    String    @map("account_id") @db.Uuid
+  roleId       String    @map("role_id") @db.Uuid
+  scopeType    ScopeType @map("scope_type")
+  scopeId      String?   @map("scope_id") @db.Uuid
+  isProvisional Boolean  @default(false) @map("is_provisional")
+  assignedById String?   @map("assigned_by") @db.Uuid
+  assignedAt   DateTime  @default(now()) @map("assigned_at")
+  revokedAt    DateTime? @map("revoked_at")
+
+  account    Account  @relation("AssignmentHolder", fields: [accountId], references: [id])
+  role       Role     @relation(fields: [roleId], references: [id])
+  assignedBy Account? @relation("AssignmentAuthor", fields: [assignedById], references: [id])
+
+  @@index([accountId, revokedAt])
+  @@index([roleId])
+  @@map("role_assignment")
+}
+
+model RolePolicy {
+  id        String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  roleId    String @map("role_id") @db.Uuid
+  policyKey String @map("policy_key")
+  params    Json
+
+  role Role @relation(fields: [roleId], references: [id])
+
+  @@unique([roleId, policyKey])
+  @@map("role_policy")
+}
+
+model PendingChange {
+  id             String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  authorAccountId String             @map("author_account_id") @db.Uuid
+  targetType     String              @map("target_type")
+  targetId       String?             @map("target_id") @db.Uuid
+  operation      ChangeOperation
+  payload        Json
+  baseRowVersion Int?                @map("base_row_version")
+  status         PendingChangeStatus
+  decidedById    String?             @map("decided_by") @db.Uuid
+  decidedAt      DateTime?           @map("decided_at")
+  decisionReason String?             @map("decision_reason")
+  createdAt      DateTime            @default(now()) @map("created_at")
+
+  author        Account        @relation("PendingAuthor", fields: [authorAccountId], references: [id])
+  decidedBy     Account?       @relation("PendingDecider", fields: [decidedById], references: [id])
+  fieldHistories FieldHistory[]
+  changeLogs    ChangeLog[]
+  notifications Notification[]
+
+  @@index([status])
+  @@index([targetType, targetId])
+  @@map("pending_change")
+}
+
+model FieldHistory {
+  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  entityType      String        @map("entity_type")
+  entityId        String        @map("entity_id") @db.Uuid
+  fieldName       String        @map("field_name")
+  oldValue        Json?         @map("old_value")
+  newValue        Json?         @map("new_value")
+  dataCategory    String        @map("data_category")
+  source          HistorySource
+  changedById     String        @map("changed_by") @db.Uuid
+  changedAt       DateTime      @default(now()) @map("changed_at")
+  pendingChangeId String?       @map("pending_change_id") @db.Uuid
+
+  changedBy     Account        @relation(fields: [changedById], references: [id])
+  pendingChange PendingChange? @relation(fields: [pendingChangeId], references: [id])
+
+  @@index([entityType, entityId])
+  @@map("field_history")
+}
+
+model ChangeLog {
+  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventType       String        @map("event_type")
+  entityType      String        @map("entity_type")
+  entityId        String        @map("entity_id") @db.Uuid
+  details         Json
+  source          HistorySource
+  actorAccountId  String        @map("actor_account_id") @db.Uuid
+  occurredAt      DateTime      @default(now()) @map("occurred_at")
+  pendingChangeId String?       @map("pending_change_id") @db.Uuid
+
+  actor         Account        @relation(fields: [actorAccountId], references: [id])
+  pendingChange PendingChange? @relation(fields: [pendingChangeId], references: [id])
+
+  @@index([entityType, entityId])
+  @@index([occurredAt])
+  @@map("change_log")
+}
+
+model Invitation {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tokenHash      String    @unique @map("token_hash")
+  email          String
+  invitedById    String    @map("invited_by") @db.Uuid
+  targetPersonId String?   @map("target_person_id") @db.Uuid
+  expiresAt      DateTime  @map("expires_at")
+  acceptedAt     DateTime? @map("accepted_at")
+
+  invitedBy    Account @relation(fields: [invitedById], references: [id])
+  targetPerson Person? @relation(fields: [targetPersonId], references: [id])
+
+  @@index([email])
+  @@map("invitation")
+}
+
+model Notification {
+  id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  recipientAccountId String    @map("recipient_account_id") @db.Uuid
+  type               String
+  pendingChangeId    String?   @map("pending_change_id") @db.Uuid
+  createdAt          DateTime  @default(now()) @map("created_at")
+  readAt             DateTime? @map("read_at")
+
+  recipient     Account        @relation(fields: [recipientAccountId], references: [id])
+  pendingChange PendingChange? @relation(fields: [pendingChangeId], references: [id])
+
+  @@index([recipientAccountId, readAt])
+  @@map("notification")
+}
