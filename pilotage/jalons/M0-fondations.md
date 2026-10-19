@@ -30,7 +30,7 @@ Le sprint S1 documente ce qui existe déjà dans le dépôt : constaté **par le
 - acceptation: `pnpm install --frozen-lockfile` réussit ; 3 workspaces reconnus
 
 #### M0.S1.A2 — Configuration TypeScript et ESLint par workspace
-- statut: REVIEW · taille: S · assigné: — · validation: —
+- statut: DONE · taille: S · assigné: — · validation: validations/M0.S1.A2.md
 - règles: EA-08 · dépend: —
 - livrables: apps/*/.eslintrc.cjs, tsconfig*.json
 - acceptation: `pnpm lint` passe sur les 3 workspaces
