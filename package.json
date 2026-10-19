@@ -13,6 +13,8 @@
     "dev:api": "pnpm --filter @family-hub/api start:dev",
     "dev:web": "pnpm --filter @family-hub/web dev",
     "prisma:generate": "pnpm --filter @family-hub/api prisma:generate",
-    "prisma:migrate": "pnpm --filter @family-hub/api prisma:migrate"
+    "prisma:migrate": "pnpm --filter @family-hub/api prisma:migrate",
+    "verify": "pnpm lint && pnpm lint:arch && pnpm prisma:generate && pnpm test && pnpm build",
+    "pilotage": "node pilotage/outils/pilotage.mjs"
   }
 }

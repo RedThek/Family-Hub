@@ -1,0 +1,7 @@
+---
+description: Règles du projet Family-Hub (renvoie vers AGENTS.md)
+alwaysApply: true
+---
+
+Lis et applique intégralement `AGENTS.md` à la racine du dépôt.
+Ce fichier ne contient volontairement aucune règle propre : toute règle se modifie dans `AGENTS.md`.
