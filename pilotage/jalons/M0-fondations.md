@@ -24,7 +24,7 @@ Le sprint S1 documente ce qui existe déjà dans le dépôt : constaté **par le
 ### Mission M0.S1.A — Monorepo et outillage
 
 #### M0.S1.A1 — Monorepo pnpm (apps/api, apps/web, packages/shared)
-- statut: REVIEW · taille: S · assigné: — · validation: —
+- statut: DONE · taille: S · assigné: — · validation: validations/M0.S1.A1.md
 - règles: ADR-002,ADR-005 · dépend: —
 - livrables: package.json, pnpm-workspace.yaml, .npmrc, .nvmrc, tsconfig.base.json
 - acceptation: `pnpm install --frozen-lockfile` réussit ; 3 workspaces reconnus
