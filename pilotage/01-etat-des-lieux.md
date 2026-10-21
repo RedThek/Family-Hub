@@ -2,7 +2,7 @@
 
 > Instantané du projet pour tout agent qui arrive. Les blocs `AUTO` sont régénérés par `node pilotage/outils/pilotage.mjs sync` ; **ne pas les éditer à la main**. Les autres sections s'enrichissent par **ajouts datés** (jamais de réécriture silencieuse).
 
-- dernière mise à jour (UTC): 2026-10-19T22:50:43Z
+- dernière mise à jour (UTC): 2026-10-21T09:36:30Z
 - mise à jour par: claude (architecte)
 - jalon courant: M0
 - sprint courant: M0.S2
@@ -13,7 +13,7 @@
 <!-- AUTO:AVANCEMENT -->
 | Jalon | Tâches | DONE | REVIEW | DOING | BLOCKED | TODO | % |
 |---|--:|--:|--:|--:|--:|--:|--:|
-| **M0** Fondations du dépôt | 26 | 2 | 11 | 0 | 0 | 13 | 8 % |
+| **M0** Fondations du dépôt | 26 | 3 | 10 | 0 | 0 | 13 | 12 % |
 | **SP1** Spike : closure table | 6 | 0 | 0 | 0 | 0 | 6 | 0 % |
 | **SP2** Spike : rendu de l'arbre | 6 | 0 | 0 | 0 | 0 | 6 | 0 % |
 | **SP3** Spike : projecteur de visibilité | 4 | 0 | 0 | 0 | 0 | 4 | 0 % |
@@ -25,7 +25,7 @@
 | **M6** Photos et documents | 14 | 0 | 0 | 0 | 0 | 14 | 0 % |
 | **M7** Recherche, doublons et arbre personnalisé | 14 | 0 | 0 | 0 | 0 | 14 | 0 % |
 | **M8** Durcissement, anonymisation et mise en production | 21 | 0 | 0 | 0 | 3 | 18 | 0 % |
-| **Total** | 203 | 2 | 11 | 0 | 3 | 187 | 1 % |
+| **Total** | 203 | 3 | 10 | 0 | 3 | 187 | 1 % |
 <!-- /AUTO:AVANCEMENT -->
 
 ## 2. Claims et reprises
@@ -37,6 +37,7 @@
 ## 3. Dernières sessions
 
 <!-- AUTO:SESSIONS -->
+- `journal/20261021-0928-gemini-validation-m0-s1-a3.md`
 - `journal/20261019-2241-copilot-validation-m0-s1-a2.md`
 - `journal/20261019-2117-copilot-validation-m0-a1.md`
 - `journal/20261019-0000-claude-initialisation-pilotage.md`

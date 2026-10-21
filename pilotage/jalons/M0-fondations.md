@@ -36,7 +36,7 @@ Le sprint S1 documente ce qui existe déjà dans le dépôt : constaté **par le
 - acceptation: `pnpm lint` passe sur les 3 workspaces
 
 #### M0.S1.A3 — Paquet partagé @family-hub/shared (APP_NAME, API_PREFIX, HEALTH_PATH)
-- statut: REVIEW · taille: S · assigné: — · validation: —
+- statut: DONE · taille: S · assigné: — · validation: validations/M0.S1.A3.md
 - règles: ADR-002 · dépend: —
 - livrables: packages/shared/
 - acceptation: `pnpm --filter @family-hub/shared build` réussit
