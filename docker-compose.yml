@@ -10,13 +10,13 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-familyhub} -d ${POSTGRES_DB:-familyhub}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-familyhub} -d ${POSTGRES_DB:-familyhub}" ]
       interval: 5s
       timeout: 5s
       retries: 10
 
   minio:
-    image: minio/minio:latest
+    image: pgsty/silo:RELEASE.2026-09-16T00-00-00Z
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-familyhub}
@@ -27,14 +27,14 @@ services:
     volumes:
       - minio_data:/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
       interval: 10s
       timeout: 5s
       retries: 10
       start_period: 10s
 
   minio-init:
-    image: minio/mc:latest
+    image: pgsty/mc:RELEASE.2026-09-16T00-00-00Z
     depends_on:
       - minio
     environment:
@@ -42,12 +42,7 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-familyhub-minio}
       MINIO_BUCKET: ${MINIO_BUCKET:-family-hub}
     entrypoint: >
-      /bin/sh -c "
-      sleep 5;
-      mc alias set local http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD &&
-      mc mb --ignore-existing local/$$MINIO_BUCKET &&
-      mc anonymous set none local/$$MINIO_BUCKET
-      "
+      /bin/sh -c " until mc alias set local http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD; do sleep 1; done && mc mb --ignore-existing local/$$MINIO_BUCKET && mc anonymous set none local/$$MINIO_BUCKET "
 
   api:
     build:
@@ -58,6 +53,7 @@ services:
         condition: service_healthy
       minio:
         condition: service_started
+    command: sh -c "pnpm exec prisma generate && pnpm exec prisma migrate deploy && node dist/main.js"
     environment:
       NODE_ENV: production
       API_PORT: 3000
@@ -74,7 +70,7 @@ services:
     ports:
       - "${API_PORT:-3000}:3000"
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/v1/health"]
+      test: [ "CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/v1/health" ]
       interval: 10s
       timeout: 5s
       retries: 10
