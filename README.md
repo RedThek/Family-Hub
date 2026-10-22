@@ -23,7 +23,7 @@ Les fichiers sans suffixe `-vN` sont des versions antérieures conservées pour 
 ## Stack (ADR-002, 004, 005)
 
 - Monorepo pnpm : `apps/api` (NestJS + Prisma), `apps/web` (React + Vite), `packages/shared`
-- PostgreSQL unique, stockage objet privé (MinIO en local)
+- PostgreSQL unique, stockage objet privé (Silo en local, fork communautaire compatible MinIO)
 - CI GitHub Actions : lint, linter d’architecture, tests, build, migration sur base vierge
 
 ## Prérequis
@@ -39,10 +39,10 @@ cp .env.example .env
 docker compose up --build
 ```
 
-Cela démarre PostgreSQL, MinIO (bucket privé `family-hub`), applique les migrations Prisma et lance l’API.
+Cela démarre PostgreSQL, Silo (compatible MinIO, bucket privé `family-hub`), applique les migrations Prisma et lance l’API.
 
 - Santé de l’API : [http://localhost:3000/api/v1/health](http://localhost:3000/api/v1/health)
-- Console MinIO : [http://localhost:9001](http://localhost:9001)
+- Console Silo / MinIO : [http://localhost:9001](http://localhost:9001)
 
 En parallèle, l’interface de développement :
 

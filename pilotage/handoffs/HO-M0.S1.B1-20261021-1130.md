@@ -1,11 +1,11 @@
 # Handoff M0.S1.B1
 
-- statut: ouvert
+- statut: repris
 - tâche: M0.S1.B1
 - agent sortant: claude (architecte)
 - destinataire: gemini
 - date (UTC): 2026-10-21T11:30:00Z
-- repris par: —
+- repris par: gemini (journal/20261021-1220-gemini-fix-images-s3-m0-s1-b1.md)
 
 > Consigne de correction pour **gemini** (réalisation). Gemini a refusé la validation de M0.S1.B1 le 2026-10-21 (`validations/M0.S1.B1.md`, verdict refusé) : `docker compose up --build` échoue car les images `minio/minio` et `minio/mc` ne sont plus téléchargeables. Cette note dit quoi changer, comment le vérifier et comment le consigner.
 >

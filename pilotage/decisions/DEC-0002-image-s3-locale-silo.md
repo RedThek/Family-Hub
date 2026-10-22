@@ -31,3 +31,9 @@ Pour le **développement local et la recette locale uniquement** :
 - La production (S3 géré, Q-HEB) reste à décider séparément : cette décision n'engage rien pour M8.
 - Mettre à jour `README.md` et le commentaire de `.env.example` ; ne pas modifier les versions antérieures de `docs/`.
 - À faire passer à `acceptée` par Mola une fois la correction de M0.S1.B1 validée par un agent autre que son réalisateur.
+
+## Vérification
+
+- Tags retenus et validés sur Docker Hub : `pgsty/silo:RELEASE.2026-09-16T00-00-00Z` et `pgsty/mc:RELEASE.2026-09-16T00-00-00Z`.
+- Binaires vérifiés dans les conteneurs : `/usr/bin/curl`, `/usr/bin/mc` et `/usr/bin/mcli` présents dans Silo ; `/usr/bin/mc` présent dans `pgsty/mc`.
+
