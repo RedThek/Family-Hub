@@ -2,7 +2,7 @@
 
 > Instantané du projet pour tout agent qui arrive. Les blocs `AUTO` sont régénérés par `node pilotage/outils/pilotage.mjs sync` ; **ne pas les éditer à la main**. Les autres sections s'enrichissent par **ajouts datés** (jamais de réécriture silencieuse).
 
-- dernière mise à jour (UTC): 2026-10-21T11:13:56Z
+- dernière mise à jour (UTC): 2026-10-22T00:55:04Z
 - mise à jour par: claude (architecte)
 - jalon courant: M0
 - sprint courant: M0.S2
@@ -13,7 +13,7 @@
 <!-- AUTO:AVANCEMENT -->
 | Jalon | Tâches | DONE | REVIEW | DOING | BLOCKED | TODO | % |
 |---|--:|--:|--:|--:|--:|--:|--:|
-| **M0** Fondations du dépôt | 26 | 3 | 9 | 1 | 0 | 13 | 12 % |
+| **M0** Fondations du dépôt | 26 | 3 | 10 | 0 | 0 | 13 | 12 % |
 | **SP1** Spike : closure table | 6 | 0 | 0 | 0 | 0 | 6 | 0 % |
 | **SP2** Spike : rendu de l'arbre | 6 | 0 | 0 | 0 | 0 | 6 | 0 % |
 | **SP3** Spike : projecteur de visibilité | 4 | 0 | 0 | 0 | 0 | 4 | 0 % |
@@ -25,23 +25,23 @@
 | **M6** Photos et documents | 14 | 0 | 0 | 0 | 0 | 14 | 0 % |
 | **M7** Recherche, doublons et arbre personnalisé | 14 | 0 | 0 | 0 | 0 | 14 | 0 % |
 | **M8** Durcissement, anonymisation et mise en production | 21 | 0 | 0 | 0 | 3 | 18 | 0 % |
-| **Total** | 203 | 3 | 9 | 1 | 3 | 187 | 1 % |
+| **Total** | 203 | 3 | 10 | 0 | 3 | 187 | 1 % |
 <!-- /AUTO:AVANCEMENT -->
 
 ## 2. Claims et reprises
 
 <!-- AUTO:CLAIMS -->
-- `M0.S1.B1` — gemini (validation) depuis 2026-10-21T10:04:01Z, heartbeat 2026-10-21T10:04:01Z
+- _aucun claim actif_
 <!-- /AUTO:CLAIMS -->
 
 ## 3. Dernières sessions
 
 <!-- AUTO:SESSIONS -->
+- `journal/20261021-1220-gemini-fix-images-s3-m0-s1-b1.md`
+- `journal/20261021-1130-claude-audit-validations-m0-s1.md`
 - `journal/20261021-1004-gemini-validation-m0-s1-b1.md`
 - `journal/20261021-0928-gemini-validation-m0-s1-a3.md`
 - `journal/20261019-2241-copilot-validation-m0-s1-a2.md`
-- `journal/20261019-2117-copilot-validation-m0-a1.md`
-- `journal/20261019-0000-claude-initialisation-pilotage.md`
 <!-- /AUTO:SESSIONS -->
 
 ## 4. Prochaines tâches éligibles
@@ -78,6 +78,10 @@
 | ECART-005 | 2026-10-19 | Dépendances absentes : argon2, helmet, @nestjs/swagger, @nestjs/throttler (M1) ; fast-check (M2) ; pg-boss, SMTP (M4) ; client S3, sharp (M6) | tâches citées | ouvert |
 | ECART-006 | 2026-10-19 | Pas de job CI pour `pilotage check` | M0.S2.C2 | ouvert |
 | ECART-007 | 2026-10-19 | ADR-012 (historique en ajout seul) et doc 07 (historique en M4) laissent les premières saisies de M2 sans trace | Q-HIST (défaut-ok) → M2.S2.A4 | ouvert |
+| ECART-008 | 2026-10-21 | Images `minio/minio` et `minio/mc` retirées de Docker Hub (MinIO distribué en source seule) : `docker compose up --build` échoue | M0.S1.B1, DEC-0002 | ouvert |
+| ECART-009 | 2026-10-21 | `pnpm` absent du PATH (poste Windows) ; les scripts racine échouent sans shim ou wrapper Corepack | M0.S2.C4 | ouvert |
+| ECART-010 | 2026-10-21 | Absence de convention pour re-validation après refus (`-r2`) et claim de validation non libéré par `set DOING` | M0.S2.C5 | ouvert |
+
 
 ## 7. Risques actifs
 

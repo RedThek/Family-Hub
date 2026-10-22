@@ -44,7 +44,7 @@ Le sprint S1 documente ce qui existe déjà dans le dépôt : constaté **par le
 ### Mission M0.S1.B — Infrastructure locale
 
 #### M0.S1.B1 — docker-compose : postgres, minio, minio-init (bucket privé), api
-- statut: DOING · taille: S · assigné: gemini · validation: —
+- statut: REVIEW · taille: S · assigné: gemini · validation: —
 - règles: ADR-010,ADR-014 · dépend: —
 - livrables: docker-compose.yml
 - acceptation: `docker compose up --build` démarre ; bucket `family-hub` privé
